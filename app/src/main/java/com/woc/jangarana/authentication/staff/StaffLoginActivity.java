@@ -3,6 +3,7 @@ package com.woc.jangarana.authentication.staff;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,6 +34,7 @@ public class StaffLoginActivity extends AppCompatActivity {
 
     RequestQueue requestQueue;
     TextView staffId, password;
+    ProgressDialog pd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,21 +43,28 @@ public class StaffLoginActivity extends AppCompatActivity {
 
         staffId = findViewById(R.id.staffID);
         password = findViewById(R.id.staffPassword);
+        pd = new ProgressDialog(this);
+        pd.setTitle("Logging in");
+        pd.setMessage("Please wait...");
+
 
 
         AppCompatButton button = findViewById(R.id.staff_login_button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                pd.show();
                 String id = staffId.getText().toString();
                 String pass = password.getText().toString();
 
                 if(TextUtils.isEmpty(id)){
                     staffId.setError("Enter Id");
+                    pd.dismiss();
                     return;
                 }
                 if(TextUtils.isEmpty(pass)){
                     password.setError("Enter password");
+                    pd.dismiss();
                 }
 
                 userSignIn(id, pass);
@@ -93,12 +102,14 @@ public class StaffLoginActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                pd.dismiss();
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("error", error.toString());
+                pd.dismiss();
             }
         });
         requestQueue = Volley.newRequestQueue(this);
